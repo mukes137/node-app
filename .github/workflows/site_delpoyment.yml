@@ -4,9 +4,6 @@ run-name: "[${{ github.event_name }} - ${{ github.ref_name }}]"
 
 on:
     workflow_dispatch:
-    push:
-      branches:
-        - workflow
 
 permissions:
       contents: read
@@ -18,6 +15,7 @@ env:
     serverIp: ${{ secrets.SERVER_IP }}
     nodeversion: 20
     githubToken: ${{ secrets.TOKEN_GITHUB }}
+    password: ${{ secrets.PASSWORD }}
 
 jobs:
     lint:
@@ -68,6 +66,11 @@ jobs:
                 node-version: 20
                 cache: npm
 
+            - name: Install sshpass
+              run: |
+                sudo apt update
+                sudo apt install sshpass
+
             - name: Set up SSH key
               run: |
                 echo "${{ secrets.NOVELTY }}" >> novelty.pem
@@ -75,7 +78,7 @@ jobs:
 
             - name: Copy files to EC2 instance
               run: |
-                sudo scp -i novelty.pem \
+                sshpass -p ${{ env.password }} sudo scp -i novelty.pem \
                 -o StrictHostKeyChecking=no \
                 -o UserKnownHostsFile=/dev/null \
                 -r ./* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app/
