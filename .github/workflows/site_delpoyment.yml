@@ -75,7 +75,7 @@ jobs:
 
             - name: Copy files to EC2 instance
               run: |
-                scp -i novelty.pem \
+                sudo scp -i novelty.pem \
                 -o StrictHostKeyChecking=no \
                 -o UserKnownHostsFile=/dev/null \
                 -r ./* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app/
