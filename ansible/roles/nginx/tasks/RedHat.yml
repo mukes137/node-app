@@ -1,0 +1,44 @@
+---
+- name: Enable nginx repo for amazon linux 2023.
+  ansible.builtin.template:
+    src: amazon2023.repo.j2
+    dest: /etc/yum.repos.d/nginx.repo
+    owner: root
+    group: "{{ nginx_root_group }}"
+    mode: "{{ nginx_file_mode }}"
+  when: nginx_amazon_2023_repo_enabled | bool
+  tags:
+    - install
+    - reinstall
+
+- name: Enable nginx repo for amazon linux2.
+  ansible.builtin.template:
+    src: amazon2.repo.j2
+    dest: /etc/yum.repos.d/nginx.repo
+    owner: root
+    group: "{{ nginx_root_group }}"
+    mode: "{{ nginx_file_mode }}"
+  when: nginx_amazon2_repo_enabled | bool
+  tags:
+    - install
+    - reinstall
+
+- name: Enable nginx repo for RedHat.
+  ansible.builtin.template:
+    src: redhat.repo.j2
+    dest: /etc/yum.repos.d/nginx.repo
+    owner: root
+    group: "{{ nginx_root_group }}"
+    mode: "{{ nginx_file_mode }}"
+  when: nginx_redhat_repo_enabled | bool
+  tags:
+    - install
+    - reinstall
+
+- name: Ensure nginx is installed.
+  ansible.builtin.package:
+    name: "{{ nginx_package_name }}"
+    state: present
+  tags:
+    - install
+    - reinstall

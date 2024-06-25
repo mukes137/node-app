@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  become: true
+  roles:
+    - nginx
+  vars:
+    ansible_shell_executable: /bin/bash
