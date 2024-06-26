@@ -1,8 +1,8 @@
 ---
 - hosts: node
   become: true
-  # become_user: mukesh
-  # become_method: sudo
+  become_user: mukesh
+  become_method: sudo
   gather_facts: true
   roles:
     - nginx
