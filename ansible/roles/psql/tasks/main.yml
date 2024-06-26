@@ -1,7 +1,7 @@
 ---
 - name: Create app directory
   file:
-    path: /home/mukesh
+    path: /home/mukesh/app
     state: directory
     mode: '0755'
     owner: mukesh

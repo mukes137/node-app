@@ -72,9 +72,17 @@ jobs:
 
             - name: Install sshpass
               run: |
+                sudo mkdir app
                 sudo apt update
                 sudo apt install sshpass -y
                 sudo apt install ansible -y
+
+            - name: Run Ansible Playbook
+              run: |
+                cd ansible
+                ansible-playbook -i inventory.txt configure.yml --private-key novelty.pem -vvv
+              env:
+                ANSIBLE_HOST_KEY_CHECKING: 'false'
 
             - name: Set up SSH key
               run: |
@@ -88,9 +96,3 @@ jobs:
                 -o UserKnownHostsFile=/dev/null \
                 -r ./* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app/
 
-            - name: Run Ansible Playbook
-              run: |
-                cd ansible
-                ansible-playbook -i inventory.txt configure.yml --private-key novelty.pem -vvv
-              env:
-                ANSIBLE_HOST_KEY_CHECKING: 'false'
