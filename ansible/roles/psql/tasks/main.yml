@@ -12,6 +12,7 @@
     name:
       - postgresql
       - postgresql-contrib
+      - python3-pip
     state: latest
     update_cache: true
 
