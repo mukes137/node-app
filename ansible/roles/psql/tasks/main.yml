@@ -13,6 +13,7 @@
       - postgresql
       - postgresql-contrib
       - python3-pip
+      - acl
     state: latest
     update_cache: true
 
