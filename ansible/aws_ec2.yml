@@ -1,7 +1,0 @@
-plugin: amazon.aws.aws_ec2
-regions:
-  - us-east-1
-hostnames:
-  - instance-id
-groups:
-  Nginx: "'' in tags.Name"

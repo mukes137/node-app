@@ -12,6 +12,7 @@ permissions:
 
 env:
     userName: mukesh
+    workDir: /home/mukesh/app
     serverIp: ${{ secrets.SERVER_IP }}
     nodeversion: 20
     githubToken: ${{ secrets.TOKEN_GITHUB }}
@@ -55,7 +56,6 @@ jobs:
         needs: lint
 
         steps:
-
             - name: Check out code
               uses: actions/checkout@v4
 
@@ -69,7 +69,8 @@ jobs:
             - name: Install sshpass
               run: |
                 sudo apt update
-                sudo apt install sshpass
+                sudo apt install sshpass -y
+                sudo apt install ansible -y
 
             - name: Set up SSH key
               run: |
@@ -82,3 +83,10 @@ jobs:
                 -o StrictHostKeyChecking=no \
                 -o UserKnownHostsFile=/dev/null \
                 -r ./* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app/
+
+            - name: Run Ansible Playbook
+              run: |
+                cd ansible
+                ansible-playbook -i inventory.txt configure.yml --private-key novelty.pem -vvv
+              env:
+                ANSIBLE_HOST_KEY_CHECKING: 'false'
