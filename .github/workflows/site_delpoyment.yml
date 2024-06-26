@@ -1,5 +1,5 @@
 ---
-name: NOODE DEPLOYMENT
+name: NODE DEPLOYMENT
 run-name: "[${{ github.event_name }} - ${{ github.ref_name }}]"
 
 on:
