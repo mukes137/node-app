@@ -1,6 +1,7 @@
 ---
 - hosts: node
   become: true
+  gather_facts: true
   roles:
     - nginx
     - psql

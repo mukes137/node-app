@@ -77,6 +77,11 @@ jobs:
                 sudo apt install sshpass -y
                 sudo apt install ansible -y
 
+            - name: Set up SSH key
+              run: |
+                echo "${{ secrets.NOVELTY }}" >> novelty.pem
+                chmod 400 novelty.pem
+
             - name: Run Ansible Playbook
               run: |
                 cd ansible
@@ -84,10 +89,6 @@ jobs:
               env:
                 ANSIBLE_HOST_KEY_CHECKING: 'false'
 
-            - name: Set up SSH key
-              run: |
-                echo "${{ secrets.NOVELTY }}" >> novelty.pem
-                chmod 400 novelty.pem
 
             - name: Copy files to EC2 instance
               run: |
