@@ -76,6 +76,7 @@ jobs:
                 sudo apt install sshpass -y
                 sudo apt install ansible -y
                 ansible --version
+                ls -la
 
             - name: Set up SSH key
               run: |
@@ -94,5 +95,11 @@ jobs:
                 sshpass -p '${{ env.password }}' scp -i novelty.pem \
                 -o StrictHostKeyChecking=no \
                 -o UserKnownHostsFile=/dev/null \
-                -r ./* ./.* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app/
+                -r ./* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app/
+            - name: Copy hidden files to EC2 instance
+              run: |
+                sshpass -p '${{ env.password }}' scp -i novelty.pem \
+                -o StrictHostKeyChecking=no \
+                -o UserKnownHostsFile=/dev/null \
+                -r .??* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app/
 
