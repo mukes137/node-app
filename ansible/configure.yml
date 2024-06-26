@@ -1,0 +1,9 @@
+---
+- hosts: node
+  become: true
+  roles:
+    - nginx
+    - psql
+  vars:
+    ansible_shell_executable: /bin/bash
+    ansible_user: mukesh
