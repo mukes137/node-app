@@ -94,6 +94,5 @@ jobs:
                 sshpass -p '${{ env.password }}' scp -i novelty.pem \
                 -o StrictHostKeyChecking=no \
                 -o UserKnownHostsFile=/dev/null \
-                -r --exclude "novelty.pem" \
-                ./* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app
+                -r ./. ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app
 
