@@ -4,6 +4,8 @@ run-name: "[${{ github.event_name }} - ${{ github.ref_name }}]"
 
 on:
     workflow_dispatch:
+    pull_request:
+      branches: test
 
 permissions:
       contents: read
@@ -44,7 +46,7 @@ jobs:
               uses: super-linter/super-linter/slim@v6
               env:
                 DEFAULT_BRANCH: main
-                FILTER_REGEX_EXCLUDE: dist/**/*
+                FILTER_REGEX_EXCLUDE: ansible
                 GITHUB_TOKEN: ${{ env.githubToken }}
                 VALIDATE_ALL_CODEBASE: false
                 VALIDATE_JAVASCRIPT_STANDARD: false
