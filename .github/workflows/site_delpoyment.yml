@@ -84,9 +84,9 @@ jobs:
 
             - name: Run Ansible Playbook
               run: |
-                ansible-playbook ansible/configure.yml -i ansible/inventory.txt --extra-vars 'ansible_sudo_pass="w@U*&5TV6"' --private-key novelty.pem
-              # env:
-              #   ANSIBLE_HOST_KEY_CHECKING: 'false'
+                ansible-playbook ansible/configure.yml -i ansible/inventory.txt --extra-vars 'ansible_sudo_pass=${{env.password}}' --private-key novelty.pem
+              env:
+                ANSIBLE_HOST_KEY_CHECKING: 'false'
 
 
             - name: Copy files to EC2 instance
