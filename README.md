@@ -21,5 +21,6 @@ Here are few requirements that I have to setup for the deployment of this applic
     - For example: `bash start` should run the database instance start local application and `bash test` should setup the databse and run the test (Hint: One of solution can be leveraging docker compose)
 
 If you have any questions please feel free to reach us.
-# novelty
+
+## novelty
 Deploying sample node app
