@@ -84,7 +84,7 @@ jobs:
 
             - name: Run Ansible Playbook
               run: |
-                ansible-playbook -i ansible/inventory.txt ansible/configure.yml --private-key novelty.pem -vvv
+                ansible-playbook -i ansible/inventory.txt ansible/configure.yml --private-key novelty.pem --extra-vars 'ansible_sudo_pass="${{ env.PASSWORD }}" -vvv
               env:
                 ANSIBLE_HOST_KEY_CHECKING: 'false'
 
