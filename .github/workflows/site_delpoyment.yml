@@ -84,8 +84,7 @@ jobs:
 
             - name: Run Ansible Playbook
               run: |
-                cd ansible
-                ansible-playbook -i inventory.txt configure.yml --private-key novelty.pem -vvv
+                ansible-playbook -i ansible/inventory.txt ansible/configure.yml --private-key novelty.pem -vvv
               env:
                 ANSIBLE_HOST_KEY_CHECKING: 'false'
 
