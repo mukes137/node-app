@@ -4,9 +4,8 @@ run-name: "[${{ github.event_name }} - ${{ github.ref_name }}]"
 
 on:
     workflow_dispatch:
-    push:
-      branches:
-        - test
+    pull_request:
+      branches: test
 
 permissions:
       contents: read
@@ -38,15 +37,15 @@ jobs:
                 node-version: 20
                 cache: npm
 
-            - name: Install Dependencies
-              id: install
-              run: npm ci
+            # - name: Install Dependencies
+            #   id: install
+            #   run: npm ci
 
             - name: Lint Codebase
               id: super-linter
               uses: super-linter/super-linter/slim@v6
               env:
-                DEFAULT_BRANCH: main
+                DEFAULT_BRANCH: test
                 FILTER_REGEX_EXCLUDE: ansible/**
                 GITHUB_TOKEN: ${{ env.githubToken }}
                 VALIDATE_ALL_CODEBASE: false
