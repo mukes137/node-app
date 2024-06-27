@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  app:
+    container_name: novelty-app
+    image: node-dev-app:latest
+    command: ["sh", "-c", "npm run db:generate && npm run start"]
+    volumes:
+      - .:/app
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - novelty
+
+  db:
+    container_name: novelty-pg
+    image: postgres:14.0
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test123
+      - POSTGRES_DB=test
+    env_file:
+      - .env
+    networks:
+      - novelty
+
+volumes:
+  postgres_data:
+
+networks:
+  novelty:
+    driver: bridge

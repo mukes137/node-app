@@ -19,6 +19,7 @@ env:
     nodeversion: 20
     githubToken: ${{ secrets.TOKEN_GITHUB }}
     password: ${{ secrets.PASSWORD }}
+    sshKey: ${{ secrets.NOVELTY}}
 
 jobs:
     lint:
@@ -80,7 +81,7 @@ jobs:
 
             - name: Set up SSH key
               run: |
-                echo "${{ secrets.NOVELTY }}" >> novelty.pem
+                echo "${{ env.sshKey }}" >> novelty.pem
                 sudo chmod 400 novelty.pem
 
             - name: Run Ansible Playbook
@@ -88,20 +89,6 @@ jobs:
                 ansible-playbook ansible/configure.yml -i ansible/inventory.txt --extra-vars 'ansible_sudo_pass=${{env.password}}' --private-key novelty.pem
               env:
                 ANSIBLE_HOST_KEY_CHECKING: 'false'
-
-
-            # - name: Copy files to EC2 instance
-            #   run: |
-            #     sshpass -p '${{ env.password }}' scp -i novelty.pem \
-            #     -o StrictHostKeyChecking=no \
-            #     -o UserKnownHostsFile=/dev/null \
-            #     -r ./* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app/
-            # - name: Copy hidden files to EC2 instance
-            #   run: |
-            #     sshpass -p '${{ env.password }}' scp -i novelty.pem \
-            #     -o StrictHostKeyChecking=no \
-            #     -o UserKnownHostsFile=/dev/null \
-            #     -r .??* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app/
 
             - name: rsync deployments
               uses: burnett01/rsync-deployments@7.0.1
@@ -112,4 +99,5 @@ jobs:
                 remote_host: ${{ env.serverIp }}
                 remote_port: 22
                 remote_user: ${{ env.userName }}
-                remote_key: ${{ secrets.NOVELTY}}
+                remote_key: ${{ env.sshKey}}
+                remote_key_pass: ${{ env.password }}
