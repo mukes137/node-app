@@ -2,3 +2,5 @@
 db_username: novelty
 db_password: novelty123
 db_name: novelty
+pg_version: 14
+app_dir: /home/mukesh/app/

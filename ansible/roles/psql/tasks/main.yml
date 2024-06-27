@@ -1,9 +1,9 @@
 ---
 - name: Create app directory
   file:
-    path: /home/mukesh/app
+    path: "{{ app_dir }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
     owner: mukesh
     group: mukesh
 
@@ -46,8 +46,8 @@
 
 - name: Create pg_ident.conf file
   template:
-    src: 'templates/pg_ident.conf.j2'
-    dest: "/etc/postgresql/14/main/pg_ident.conf"
+    src: "templates/pg_ident.conf.j2"
+    dest: "/etc/postgresql/{{ pg_version }}/main/pg_ident.conf"
     force: true
     owner: postgres
     group: postgres
@@ -55,8 +55,8 @@
 
 - name: Create pg_hba.conf file
   template:
-    src: 'templates/pg_hba.conf.j2'
-    dest: "/etc/postgresql/14/main/pg_hba.conf"
+    src: "templates/pg_hba.conf.j2"
+    dest: "/etc/postgresql/{{ pg_version }}/main/pg_hba.conf"
     force: true
     owner: postgres
     group: postgres

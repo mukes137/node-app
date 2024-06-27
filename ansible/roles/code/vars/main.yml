@@ -4,3 +4,5 @@ db_username: novelty
 db_password: novelty123
 db_port: 5432
 db_name: novelty
+docker_compose_service_name: db
+app_dir: /home/mukesh/app/
