@@ -107,4 +107,12 @@ jobs:
                 host: ${{ env.serverIp }}
                 username: ${{ env.userName }}
                 key: ${{ env.sshKey }}
-                script: /bin/bash deploy.sh
+                script: /bin/bash ${{ env.workDir }}/deploy.sh
+
+            # - name: create-directory
+            #   uses: nekiro/ssh-job@main
+            #   with:
+            #     host: ${{ env.serverIp }}
+            #     key: ${{ env.sshKey }}
+            #     user: ${{ env.userName }}
+            #     command: /bin/bash deploy.sh
