@@ -2,7 +2,7 @@
 - name: Create .env file
   template:
     src: "templates/code.env.j2"
-    dest: "{{ env.app_dir }}/.env"
+    dest: "{{ app_dir }}/.env"
     force: true
     owner: mukesh
     group: mukesh
