@@ -14,14 +14,13 @@ RUN apt-get update && apt-get install -y \
 COPY package*.json ./
 
 # Download and install Yarn
-RUN npm install -g yarn
-# RUN curl -o- -L https://yarnpkg.com/install.sh | bash
+RUN curl -o- -L https://yarnpkg.com/install.sh | bash
 
 # Add Yarn to PATH
 ENV PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
 # Install project dependencies
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile && npx prisma generate
 
 # Copy the rest of the application code
 COPY . .
