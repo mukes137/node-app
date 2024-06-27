@@ -101,6 +101,10 @@ jobs:
                 remote_user: ${{ env.userName }}
                 remote_key: ${{ env.sshKey}}
 
-            - name: Run the bash script inside the server
-              run: |
-                /bin/bash ${{ env.workDir }}/deploy.sh
+            - name: Execute bash script
+              uses: appleboy/ssh-action@master
+              with:
+                host: ${{ env.serverIp }}
+                username: ${{ env.userName }}
+                key: ${{ env.sshKey }}
+                script: /bin/bash deploy.sh
