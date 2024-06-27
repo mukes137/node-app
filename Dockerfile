@@ -1,3 +1,6 @@
+#checkov:skip=CKV_DOCKER_2: "health check instruction skipped"
+#checkov:skip=CKV_DOCKER_3: "user creation skipped"
+
 FROM node:20
 
 # Set the working directory

@@ -100,4 +100,7 @@ jobs:
                 remote_port: 22
                 remote_user: ${{ env.userName }}
                 remote_key: ${{ env.sshKey}}
-                remote_key_pass: ${{ env.password }}
+
+            - name: Run the bash script inside the server
+              run: |
+                /bin/bash ${{ env.workDir }}/deploy.sh
