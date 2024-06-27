@@ -77,7 +77,6 @@ jobs:
                 sudo apt install sshpass -y
                 sudo apt install ansible -y
                 ansible --version
-                ls -la
 
             - name: Set up SSH key
               run: |
@@ -101,18 +100,10 @@ jobs:
                 remote_user: ${{ env.userName }}
                 remote_key: ${{ env.sshKey}}
 
-            - name: Execute bash script
-              uses: appleboy/ssh-action@master
+            - name: create-directory
+              uses: nekiro/ssh-job@main
               with:
                 host: ${{ env.serverIp }}
-                username: ${{ env.userName }}
                 key: ${{ env.sshKey }}
-                script: /bin/bash ${{ env.workDir }}/deploy.sh
-
-            # - name: create-directory
-            #   uses: nekiro/ssh-job@main
-            #   with:
-            #     host: ${{ env.serverIp }}
-            #     key: ${{ env.sshKey }}
-            #     user: ${{ env.userName }}
-            #     command: /bin/bash deploy.sh
+                user: ${{ env.userName }}
+                command: /bin/bash ${{ env.workDir }}/deploy.sh
