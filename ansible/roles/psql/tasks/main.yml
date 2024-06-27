@@ -1,7 +1,7 @@
 ---
 - name: Create app directory
   file:
-    path: /home/mukesh
+    path: /home/mukesh/app
     state: directory
     mode: '0755'
     owner: mukesh
@@ -12,6 +12,8 @@
     name:
       - postgresql
       - postgresql-contrib
+      - python3-pip
+      - acl
     state: latest
     update_cache: true
 
@@ -23,21 +25,39 @@
   become: true
   become_user: postgres
   postgresql_user:
-    name: novelty
-    password: novelty123
+    name: "{{ db_username }}"
+    password: "{{ db_password }}"
 
 - name: Create database for the application
   become: true
   become_user: postgres
   postgresql_db:
-    name: novelty
+    name: "{{ db_name }}"
 
 - name: Ensure the new user has access to the database
   become: true
   become_user: postgres
   postgresql_privs:
-    db: novelty
-    role: novelty
+    db: "{{ db_name }}"
+    role: "{{ db_username }}"
     objs: ALL_IN_SCHEMA
     privs: ALL
   notify: Restart psql
+
+- name: Create pg_ident.conf file
+  template:
+    src: 'templates/pg_ident.conf.j2'
+    dest: "/etc/postgresql/14/main/pg_ident.conf"
+    force: true
+    owner: postgres
+    group: postgres
+    mode: "0640"
+
+- name: Create pg_hba.conf file
+  template:
+    src: 'templates/pg_hba.conf.j2'
+    dest: "/etc/postgresql/14/main/pg_hba.conf"
+    force: true
+    owner: postgres
+    group: postgres
+    mode: "0640"

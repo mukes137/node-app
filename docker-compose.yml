@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  app:
+    container_name: novelty-app
+    image: novelty:v7
+    command: ["sh", "-c", "yarn run db:migrate:dev && yarn start"]
+    volumes:
+      - .:/app
+    ports:
+      - "7000:7000"
+    depends_on:
+      - db
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - novelty
+
+  db:
+    container_name: novelty-pg
+    image: postgres:14.0
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    networks:
+      - novelty
+
+volumes:
+  postgres_data:
+
+networks:
+  novelty:
+    driver: bridge

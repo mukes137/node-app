@@ -1,8 +1,0 @@
----
-- name: Run Debian specific tasks.
-  ansible.builtin.import_tasks: Ubuntu.yml
-  when: ansible_distribution == "Ubuntu"
-
-- name: Run RedHat specific tasks.
-  ansible.builtin.import_tasks: RedHat.yml
-  when: ansible_os_family == "RedHat"

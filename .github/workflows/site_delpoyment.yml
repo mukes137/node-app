@@ -1,92 +1,96 @@
 ---
-name: NOODE DEPLOYMENT
+name: NODE DEPLOYMENT
 run-name: "[${{ github.event_name }} - ${{ github.ref_name }}]"
 
 on:
-    workflow_dispatch:
+  workflow_dispatch:
 
 permissions:
-      contents: read
-      packages: read
-      statuses: write
+  contents: read
+  packages: read
+  statuses: write
 
 env:
-    userName: mukesh
-    workDir: /home/mukesh/app
-    serverIp: ${{ secrets.SERVER_IP }}
-    nodeversion: 20
-    githubToken: ${{ secrets.TOKEN_GITHUB }}
-    password: ${{ secrets.PASSWORD }}
+  userName: mukesh
+  workDir: /home/mukesh/app
+  serverIp: ${{ secrets.SERVER_IP }}
+  nodeversion: 20
+  githubToken: ${{ secrets.TOKEN_GITHUB }}
+  password: ${{ secrets.PASSWORD }}
+  sshKey: ${{ secrets.NOVELTY}}
+  branchName: main
 
 jobs:
-    lint:
-        name: Linting
-        runs-on: ubuntu-22.04
+  lint:
+    name: Linting
+    runs-on: ubuntu-22.04
 
-        steps:
-            - name: Checkout
-              id: checkout
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-            - name: Setup Node.js
-              id: setup-node
-              uses: actions/setup-node@v4
-              with:
-                node-version: 20
-                cache: npm
+      - name: Setup Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
 
-            - name: Install Dependencies
-              id: install
-              run: npm ci
+      - name: Lint Codebase
+        id: super-linter
+        uses: super-linter/super-linter/slim@v6
+        env:
+          DEFAULT_BRANCH: ${{ env.branchName }}
+          FILTER_REGEX_EXCLUDE: ansible/**
+          GITHUB_TOKEN: ${{ env.githubToken }}
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_JAVASCRIPT_STANDARD: false
+          VALIDATE_JSCPD: false
 
-            - name: Lint Codebase
-              id: super-linter
-              uses: super-linter/super-linter/slim@v6
-              env:
-                DEFAULT_BRANCH: main
-                FILTER_REGEX_EXCLUDE: dist/**/*
-                GITHUB_TOKEN: ${{ env.githubToken }}
-                VALIDATE_ALL_CODEBASE: false
-                VALIDATE_JAVASCRIPT_STANDARD: false
-                VALIDATE_JSCPD: false
+  build:
+    name: Deployment of nocode backend
+    runs-on: ubuntu-22.04
+    needs: lint
 
-    build:
-        name: Deployment of nocode backend
-        runs-on: ubuntu-22.04
-        needs: lint
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
 
-        steps:
-            - name: Check out code
-              uses: actions/checkout@v4
+      - name: Setup Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
 
-            - name: Setup Node.js
-              id: setup-node
-              uses: actions/setup-node@v4
-              with:
-                node-version: 20
-                cache: npm
+      - name: Install sshpass
+        run: |
+          sudo apt update
+          sudo apt install sshpass -y
+          sudo apt install ansible -y
+          ansible --version
 
-            - name: Install sshpass
-              run: |
-                sudo apt update
-                sudo apt install sshpass -y
-                sudo apt install ansible -y
+      - name: Set up SSH key
+        run: |
+          echo "${{ env.sshKey }}" >> novelty.pem
+          sudo chmod 400 novelty.pem
 
-            - name: Set up SSH key
-              run: |
-                echo "${{ secrets.NOVELTY }}" >> novelty.pem
-                chmod 400 novelty.pem
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook ansible/configure.yml -i ansible/inventory.txt --extra-vars 'ansible_sudo_pass=${{env.password}}' --private-key novelty.pem
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "false"
 
-            - name: Copy files to EC2 instance
-              run: |
-                sshpass -p '${{ env.password }}' scp -i novelty.pem \
-                -o StrictHostKeyChecking=no \
-                -o UserKnownHostsFile=/dev/null \
-                -r ./* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app/
-
-            - name: Run Ansible Playbook
-              run: |
-                cd ansible
-                ansible-playbook -i inventory.txt configure.yml --private-key novelty.pem -vvv
-              env:
-                ANSIBLE_HOST_KEY_CHECKING: 'false'
+      - name: rsync deployments
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr --exclude="ansible/" --exclude=".github/" --exclude=".git/" --exclude=".gitignore" --exclude="node_modules/" --exclude="package-lock.json" --exclude="package.json" --exclude="README.md" --exclude="LICENSE"
+          path: ./
+          remote_path: ${{ env.workDir }}
+          remote_host: ${{ env.serverIp }}
+          remote_port: 22
+          remote_user: ${{ env.userName }}
+          remote_key: ${{ env.sshKey}}

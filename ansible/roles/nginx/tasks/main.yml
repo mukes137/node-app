@@ -1,35 +1,23 @@
----
-- name: Include OS-specific variables.
-  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+- name: Install Nginx
+  apt:
+    name:
+      - nginx
+    update_cache: true
+    state: present
 
-- name: Check if gather_facts is enabled
-  ansible.builtin.fail:
-    msg: "Fact gathering is disabled. This roles requires gather_facts to be enabled. Please enable fact gathering using 'gather_facts: true' in your playbook."
-  when: ansible_facts == {}
+- name: delete the default config file for nginx
+  file:
+    path: "/etc/nginx/sites-enabled/default"
+    state: absent
 
-- name: Install nginx for windows
-  ansible.builtin.include_tasks: Windows.yml
-  when: ansible_os_family == "Windows"
-
-- name: Nginx for Linux
-  ansible.builtin.include_tasks: linux.yml
-  when: ansible_system == "Linux"
-
-- ansible.builtin.import_tasks: vhosts.yml
-
-# Nginx setup.
-- name: Copy nginx configuration in place.
+- name: Install nginx configuration
   template:
-    src: "{{ nginx_conf_template }}"
-    dest: "{{ nginx_conf_file_path }}"
-    owner: root
-    group: "{{ nginx_root_group }}"
-    mode: "0644"
-  notify:
-    - Reload nginx
+    src: 'templates/nginx.conf.j2'
+    dest: '/etc/nginx/sites-available/{{ server_name }}.conf'
 
-- name: Ensure nginx service is running as configured.
-  service:
-    name: nginx
-    state: "{{ nginx_service_state }}"
-    enabled: "{{ nginx_service_enabled }}"
+- name: Enable the config template from Nginx available sites
+  file:
+    src: "/etc/nginx/sites-available/{{ server_name }}.conf"
+    dest: "/etc/nginx/sites-enabled/{{ server_name }}.conf"
+    state: link
+  notify: Restart nginx
