@@ -50,7 +50,7 @@ jobs:
         uses: super-linter/super-linter/slim@v6
         env:
           DEFAULT_BRANCH: ${{ env.branchName }}
-          FILTER_REGEX_InCLUDE: .*src/.*
+          FILTER_REGEX_InCLUDE: "^src/.*"
           GITHUB_TOKEN: ${{ env.githubToken }}
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_JAVASCRIPT_STANDARD: false
