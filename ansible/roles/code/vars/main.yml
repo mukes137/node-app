@@ -1,5 +1,5 @@
 ---
-app_port: 3000
+app_port: 5000
 db_username: novelty
 db_password: novelty123
 db_port: 5432

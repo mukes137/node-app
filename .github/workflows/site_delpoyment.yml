@@ -3,107 +3,96 @@ name: NODE DEPLOYMENT
 run-name: "[${{ github.event_name }} - ${{ github.ref_name }}]"
 
 on:
-    workflow_dispatch:
-    pull_request:
-      branches: main
+  workflow_dispatch:
+  pull_request:
+    branches: main
 
 permissions:
-      contents: read
-      packages: read
-      statuses: write
+  contents: read
+  packages: read
+  statuses: write
 
 env:
-    userName: mukesh
-    workDir: /home/mukesh/app
-    serverIp: ${{ secrets.SERVER_IP }}
-    nodeversion: 20
-    githubToken: ${{ secrets.TOKEN_GITHUB }}
-    password: ${{ secrets.PASSWORD }}
-    sshKey: ${{ secrets.NOVELTY}}
+  userName: mukesh
+  workDir: /home/mukesh/app
+  serverIp: ${{ secrets.SERVER_IP }}
+  nodeversion: 20
+  githubToken: ${{ secrets.TOKEN_GITHUB }}
+  password: ${{ secrets.PASSWORD }}
+  sshKey: ${{ secrets.NOVELTY}}
+  branchName: test
 
 jobs:
-    lint:
-        name: Linting
-        runs-on: ubuntu-22.04
+  lint:
+    name: Linting
+    runs-on: ubuntu-22.04
 
-        steps:
-            - name: Checkout
-              id: checkout
-              uses: actions/checkout@v4
-              with:
-                fetch-depth: 0
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-            - name: Setup Node.js
-              id: setup-node
-              uses: actions/setup-node@v4
-              with:
-                node-version: 20
-                cache: npm
+      - name: Setup Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
 
-            # - name: Install Dependencies
-            #   id: install
-            #   run: npm ci
+      - name: Lint Codebase
+        id: super-linter
+        uses: super-linter/super-linter/slim@v6
+        env:
+          DEFAULT_BRANCH: ${{ env.branchName }}
+          FILTER_REGEX_EXCLUDE: ansible/**
+          GITHUB_TOKEN: ${{ env.githubToken }}
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_JAVASCRIPT_STANDARD: false
+          VALIDATE_JSCPD: false
 
-            - name: Lint Codebase
-              id: super-linter
-              uses: super-linter/super-linter/slim@v6
-              env:
-                DEFAULT_BRANCH: test
-                FILTER_REGEX_EXCLUDE: ansible/**
-                GITHUB_TOKEN: ${{ env.githubToken }}
-                VALIDATE_ALL_CODEBASE: false
-                VALIDATE_JAVASCRIPT_STANDARD: false
-                VALIDATE_JSCPD: false
+  build:
+    name: Deployment of nocode backend
+    runs-on: ubuntu-22.04
+    needs: lint
 
-    build:
-        name: Deployment of nocode backend
-        runs-on: ubuntu-22.04
-        needs: lint
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
 
-        steps:
-            - name: Check out code
-              uses: actions/checkout@v4
+      - name: Setup Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
 
-            - name: Setup Node.js
-              id: setup-node
-              uses: actions/setup-node@v4
-              with:
-                node-version: 20
-                cache: npm
+      - name: Install sshpass
+        run: |
+          sudo apt update
+          sudo apt install sshpass -y
+          sudo apt install ansible -y
+          ansible --version
 
-            - name: Install sshpass
-              run: |
-                sudo apt update
-                sudo apt install sshpass -y
-                sudo apt install ansible -y
-                ansible --version
+      - name: Set up SSH key
+        run: |
+          echo "${{ env.sshKey }}" >> novelty.pem
+          sudo chmod 400 novelty.pem
 
-            - name: Set up SSH key
-              run: |
-                echo "${{ env.sshKey }}" >> novelty.pem
-                sudo chmod 400 novelty.pem
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook ansible/configure.yml -i ansible/inventory.txt --extra-vars 'ansible_sudo_pass=${{env.password}}' --private-key novelty.pem
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "false"
 
-            - name: Run Ansible Playbook
-              run: |
-                ansible-playbook ansible/configure.yml -i ansible/inventory.txt --extra-vars 'ansible_sudo_pass=${{env.password}}' --private-key novelty.pem
-              env:
-                ANSIBLE_HOST_KEY_CHECKING: 'false'
-
-            - name: rsync deployments
-              uses: burnett01/rsync-deployments@7.0.1
-              with:
-                switches: -avzr --exclude="ansible/" --exclude=".github/" --exclude=".git/" --exclude=".gitignore" --exclude="node_modules/" --exclude="package-lock.json" --exclude="package.json" --exclude="README.md" --exclude="LICENSE"
-                path: ./
-                remote_path: ${{ env.workDir }}
-                remote_host: ${{ env.serverIp }}
-                remote_port: 22
-                remote_user: ${{ env.userName }}
-                remote_key: ${{ env.sshKey}}
-
-            - name: create-directory
-              uses: nekiro/ssh-job@main
-              with:
-                host: ${{ env.serverIp }}
-                key: ${{ env.sshKey }}
-                user: ${{ env.userName }}
-                command: /bin/bash ${{ env.workDir }}/deploy.sh
+      - name: rsync deployments
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr --exclude="ansible/" --exclude=".github/" --exclude=".git/" --exclude=".gitignore" --exclude="node_modules/" --exclude="package-lock.json" --exclude="package.json" --exclude="README.md" --exclude="LICENSE"
+          path: ./
+          remote_path: ${{ env.workDir }}
+          remote_host: ${{ env.serverIp }}
+          remote_port: 22
+          remote_user: ${{ env.userName }}
+          remote_key: ${{ env.sshKey}}
