@@ -20,7 +20,7 @@ RUN curl -o- -L https://yarnpkg.com/install.sh | bash
 ENV PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
 # Install project dependencies
-RUN yarn install --frozen-lockfile && npx prisma generate
+RUN yarn install --frozen-lockfile
 
 # Copy the rest of the application code
 COPY . .
