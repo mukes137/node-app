@@ -15,6 +15,7 @@ permissions:
 
 env:
   userName: mukesh
+  port: 22
   workDir: /home/mukesh/app
   serverIp: ${{ secrets.SERVER_IP }}
   nodeversion: 20
@@ -115,3 +116,7 @@ jobs:
           remote_port: 22
           remote_user: ${{ env.userName }}
           remote_key: ${{ env.sshKey}}
+
+      - name: executing remote ssh commands using password
+        run: |
+          ssh -i novelty.pem ${{env.userName}}@${{ env.serverIp }} 'bash -s ${{ github.sha }}' < deploy.sh
