@@ -112,4 +112,4 @@ jobs:
                 remote_host: ${{ env.serverIp }}
                 remote_port: 22
                 remote_user: ${{ env.userName }}
-                remote_key: ${{ env.password }}
+                remote_key: novelty.pem
