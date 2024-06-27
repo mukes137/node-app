@@ -103,7 +103,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: ${{ env.dockerUsername }}/${{ env.appName }}:${{ github.sha }}
+          tags: ${{ env.dockerUsername }}/novelty:${{ github.sha }}
 
       - name: rsync deployments
         uses: burnett01/rsync-deployments@7.0.1
