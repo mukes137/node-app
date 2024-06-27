@@ -1,0 +1,34 @@
+---
+# - name: Compress codebase directory
+#   archive:
+#     path: /home/mukesh/Desktop/k8s-project/my/novelty/sample-node-dev
+#     dest: /home/mukesh/Desktop/k8s-project/my/novelty/code.zip
+#     exclude_path:
+#     - /home/mukesh/Desktop/k8s-project/my/novelty/sample-node-dev/ansible/
+#     - /home/mukesh/Desktop/k8s-project/my/novelty/sample-node-dev/.github/
+#     format: zip
+#   delegate_to: localhost
+
+# - name: Copy codesbase file from local to server
+#   copy:
+#       src: /home/mukesh/Desktop/k8s-project/my/novelty/code.zip
+#       dest: /home/mukesh/app/
+#       owner: mukesh
+#       group: mukesh
+#       mode: '0755'
+#       remote_src: true
+
+# - name: Extract the compressed directory
+#   ansible.builtin.unarchive:
+#     src: /home/mukesh/app/code.zip
+#     dest: /home/mukesh/app/
+#     remote_src: true
+
+- name: Create .env file
+  template:
+    src: 'templates/code.env.j2'
+    dest: "/home/mukesh/app/.env"
+    force: true
+    owner: mukesh
+    group: mukesh
+    mode: "0644"

@@ -25,21 +25,21 @@
   become: true
   become_user: postgres
   postgresql_user:
-    name: novelty
-    password: novelty123
+    name: "{{ db_username }}"
+    password: "{{ db_password }}"
 
 - name: Create database for the application
   become: true
   become_user: postgres
   postgresql_db:
-    name: novelty
+    name: "{{ db_name }}"
 
 - name: Ensure the new user has access to the database
   become: true
   become_user: postgres
   postgresql_privs:
-    db: novelty
-    role: novelty
+    db: "{{ db_name }}"
+    role: "{{ db_username }}"
     objs: ALL_IN_SCHEMA
     privs: ALL
   notify: Restart psql

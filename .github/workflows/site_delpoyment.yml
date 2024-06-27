@@ -90,16 +90,26 @@ jobs:
                 ANSIBLE_HOST_KEY_CHECKING: 'false'
 
 
-            - name: Copy files to EC2 instance
-              run: |
-                sshpass -p '${{ env.password }}' scp -i novelty.pem \
-                -o StrictHostKeyChecking=no \
-                -o UserKnownHostsFile=/dev/null \
-                -r ./* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app/
-            - name: Copy hidden files to EC2 instance
-              run: |
-                sshpass -p '${{ env.password }}' scp -i novelty.pem \
-                -o StrictHostKeyChecking=no \
-                -o UserKnownHostsFile=/dev/null \
-                -r .??* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app/
+            # - name: Copy files to EC2 instance
+            #   run: |
+            #     sshpass -p '${{ env.password }}' scp -i novelty.pem \
+            #     -o StrictHostKeyChecking=no \
+            #     -o UserKnownHostsFile=/dev/null \
+            #     -r ./* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app/
+            # - name: Copy hidden files to EC2 instance
+            #   run: |
+            #     sshpass -p '${{ env.password }}' scp -i novelty.pem \
+            #     -o StrictHostKeyChecking=no \
+            #     -o UserKnownHostsFile=/dev/null \
+            #     -r .??* ${{ env.userName }}@${{ env.serverIp }}:/home/mukesh/app/
 
+            - name: rsync deployments
+              uses: burnett01/rsync-deployments@7.0.1
+              with:
+                switches: -avzr --exclude="ansible/" --exclude=".github/" --exclude=".git/" --exclude=".gitignore" --exclude="node_modules/" --exclude="package-lock.json" --exclude="package.json" --exclude="README.md" --exclude="LICENSE"
+                path: ./
+                remote_path: ${{ env.workDir }}
+                remote_host: ${{ env.serverIp }}
+                remote_port: 22
+                remote_user: ${{ env.userName }}
+                remote_key: ${{ env.password }}

@@ -6,6 +6,7 @@
   roles:
     - nginx
     - psql
+    - code
   vars:
     ansible_shell_executable: /bin/bash
     ansible_user: mukesh
