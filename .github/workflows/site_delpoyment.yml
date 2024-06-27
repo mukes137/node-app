@@ -4,6 +4,9 @@ run-name: "[${{ github.event_name }} - ${{ github.ref_name }}]"
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -102,13 +105,13 @@ jobs:
           push: true
           tags: ${{ env.dockerUsername }}/${{ env.appName }}:${{ github.sha }}
 
-      # - name: rsync deployments
-      #   uses: burnett01/rsync-deployments@7.0.1
-      #   with:
-      #     switches: -avzr --exclude="ansible/" --exclude=".github/" --exclude=".git/" --exclude=".gitignore" --exclude="node_modules/" --exclude="package-lock.json" --exclude="package.json" --exclude="README.md" --exclude="LICENSE"
-      #     path: ./
-      #     remote_path: ${{ env.workDir }}
-      #     remote_host: ${{ env.serverIp }}
-      #     remote_port: 22
-      #     remote_user: ${{ env.userName }}
-      #     remote_key: ${{ env.sshKey}}
+      - name: rsync deployments
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr --include="deploy.sh" --include="docker-compose.yml"
+          path: ./
+          remote_path: ${{ env.workDir }}
+          remote_host: ${{ env.serverIp }}
+          remote_port: 22
+          remote_user: ${{ env.userName }}
+          remote_key: ${{ env.sshKey}}
