@@ -22,7 +22,6 @@ env:
   branchName: main
   dockerHubToken: ${{ secrets.DOCKERHUB_TOKEN }}
   dockerUsername: mukesh1111
-  appName: node-app
 
 jobs:
   lint:
