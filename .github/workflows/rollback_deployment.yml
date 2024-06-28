@@ -10,8 +10,13 @@ permissions:
   statuses: write
 
 env:
+  userName: mukesh
+  serverIp: ${{ secrets.SERVER_IP }}
+  sshKey: ${{ secrets.NOVELTY}}
   dockerHubToken: ${{ secrets.DOCKERHUB_TOKEN }}
   dockerUsername: mukesh1111
+  prevImage: faa44680605849bd7c23c1bd6cee123c156ee0b8
+  newImage: 6d5e746e05bb9914198b239b33a58ff929759406
 
 jobs:
   rollback:
@@ -27,19 +32,20 @@ jobs:
           username: ${{ env.dockerUsername }}
           password: ${{ env.dockerHubToken }}
 
-      - name: Get previous image tag
-        id: prev-tag
+      - name: Set up SSH key
         run: |
-          # Fetch all tags and sort them to get the previous tag
-          TAGS=$(curl -s https://registry.hub.docker.com/v1/repositories/${{ env.dockerUsername }}/novelty/tags | jq -r '.[].name' | sort -V)
-          PREV_TAG=$(echo "$TAGS" | grep -B1 "${{ github.sha }}" | head -n 1)
-          echo "Previous tag: $PREV_TAG"
-          echo "PREV_TAG=$PREV_TAG" >> $GITHUB_ENV
+          echo "${{ env.sshKey }}" >> novelty.pem
+          sudo chmod 400 novelty.pem
 
       - name: Pull previous Docker image
-        run: docker pull ${{ env.dockerUsername }}/novelty:${{ env.PREV_TAG }}
+        run: docker pull ${{ env.dockerUsername }}/novelty:${{ env.prevImage }}
 
       - name: Tag previous Docker image as latest
         run: |
-          docker tag ${{ env.dockerUsername }}/novelty:${{ env.PREV_TAG }} ${{ env.dockerUsername }}/novelty:latest
-          docker push ${{ env.dockerUsername }}/novelty:latest
+          docker tag ${{ env.dockerUsername }}/novelty:${{ env.prevImage }} ${{ env.dockerUsername }}/novelty:${{ env.newImage }}
+          docker push ${{ env.dockerUsername }}/novelty:${{ env.newImage }}
+
+      - name: executing remote ssh commands using password
+        run: |
+          sleep 20
+          ssh -i novelty.pem ${{env.userName}}@${{ env.serverIp }} 'bash -s ${{ env.newImage }}' < deploy.sh

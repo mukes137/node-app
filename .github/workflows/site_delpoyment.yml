@@ -22,7 +22,6 @@ env:
   branchName: main
   dockerHubToken: ${{ secrets.DOCKERHUB_TOKEN }}
   dockerUsername: mukesh1111
-  appName: node-app
 
 jobs:
   lint:
@@ -71,7 +70,7 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install sshpass
+      - name: Install ansible
         run: |
           sudo apt update
           sudo apt install sshpass -y
