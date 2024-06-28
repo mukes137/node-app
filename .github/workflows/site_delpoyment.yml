@@ -48,6 +48,7 @@ jobs:
         uses: super-linter/super-linter/slim@v6
         env:
           DEFAULT_BRANCH: ${{ env.branchName }}
+          FILTER_REGEX_EXCLUDE: ".github/**"
           FILTER_REGEX_INCLUDE: "^src/.*"
           GITHUB_TOKEN: ${{ env.githubToken }}
           VALIDATE_ALL_CODEBASE: false
