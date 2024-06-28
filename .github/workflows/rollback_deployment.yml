@@ -4,6 +4,11 @@ name: ROLLBACK DEPLOYMENT
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: read
+  statuses: write
+
 env:
   dockerHubToken: ${{ secrets.DOCKERHUB_TOKEN }}
   dockerUsername: mukesh1111
