@@ -19,7 +19,7 @@
 
    - Developed Dockerfile and Docker Compose setup:
      - Crafted Dockerfile to containerize the application environment, defining dependencies and runtime configurations.
-     - Orchestrated Docker Compose for local deployment, testing application functionality in a controlled environment.
+     - Orchestrated Docker Compose for deployment, testing application functionality in a controlled environment.
      - Verified seamless integration of components within Docker containers to ensure consistency across different deployment environments.
 
 4. **Pre-commit Hooks for Static Code Analysis**
@@ -57,12 +57,6 @@
        - **prettier**: Formats code according to Prettier's style guidelines, ensuring consistent code formatting across the project.
        - **dansabel**: Lints Jinja2 template files (matching `(\.j2)$|/templates/.*`) to maintain template syntax and style consistency.
 
-     - Installed pre-commit hooks by running the command:
-
-       ```sh
-       pre-commit install
-       ```
-
      - Now, every commit triggers these hooks, preventing code that doesn't meet the quality standards from being committed.
 
 ## GitHub Actions Workflow
@@ -74,7 +68,6 @@
        - **Build Docker Image**: Automated the process of building Docker images based on code changes.
        - **Push to Docker Hub**: Integrated Docker Hub to store and manage Docker images securely.
        - **Deploy to EC2 Server**: Orchestrated deployment to an EC2 instance, ensuring continuous delivery of updated application versions.
-       - **Post-Deployment Tasks**: Included post-deployment tasks such as database migrations or cache clearing to maintain application integrity.
 
 ## Conclusion
 
