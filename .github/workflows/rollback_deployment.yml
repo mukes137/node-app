@@ -48,4 +48,4 @@ jobs:
       - name: executing remote ssh commands using password
         run: |
           sleep 20
-          ssh -i novelty.pem ${{env.userName}}@${{ env.serverIp }} 'bash -s ${{ github.sha }}' < deploy.sh
+          ssh -i novelty.pem ${{env.userName}}@${{ env.serverIp }} 'bash -s ${{ env.newImage }}' < deploy.sh
