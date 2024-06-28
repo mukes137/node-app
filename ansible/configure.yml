@@ -5,7 +5,7 @@
   gather_facts: true
   roles:
     - nginx
-    - psql
+    # - psql
     - code
   vars:
     ansible_shell_executable: /bin/bash
