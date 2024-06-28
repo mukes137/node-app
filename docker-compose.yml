@@ -3,10 +3,8 @@ version: "3.9"
 services:
   app:
     container_name: novelty-app
-    image: mukesh1111/novelty:3cf9b0180941b6e92abbbf5dacd6b45e401db92d
+    image: mukesh1111/novelty:6d5e746e05bb9914198b239b33a58ff929759406
     command: ["bash", "-c", "yarn run db:migrate:dev && yarn start"]
-    volumes:
-      - .:/app
     ports:
       - "7000:7000"
     depends_on:
@@ -25,6 +23,10 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
+    environment:
+      - POSTGRES_USER=novelty
+      - POSTGRES_PASSWORD=novelty123
+      - POSTGRES_DB=novelty
     env_file:
       - .env
     networks:
