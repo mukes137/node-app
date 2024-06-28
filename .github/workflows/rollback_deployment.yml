@@ -12,6 +12,7 @@ permissions:
 env:
   dockerHubToken: ${{ secrets.DOCKERHUB_TOKEN }}
   dockerUsername: mukesh1111
+  prevImage: faa44680605849bd7c23c1bd6cee123c156ee0b8
 
 jobs:
   rollback:
@@ -27,17 +28,8 @@ jobs:
           username: ${{ env.dockerUsername }}
           password: ${{ env.dockerHubToken }}
 
-      - name: Get previous image tag
-        id: prev-tag
-        run: |
-          # Fetch all tags and sort them to get the previous tag
-          TAGS=$(curl -s https://registry.hub.docker.com/v1/repositories/${{ env.dockerUsername }}/novelty/tags | jq -r '.[].name' | sort -V)
-          PREV_TAG=$(echo "$TAGS" | grep -B1 "${{ github.sha }}" | head -n 1)
-          echo "Previous tag: $PREV_TAG"
-          echo "PREV_TAG=$PREV_TAG" >> $GITHUB_ENV
-
       - name: Pull previous Docker image
-        run: docker pull ${{ env.dockerUsername }}/novelty:${{ env.PREV_TAG }}
+        run: docker pull ${{ env.dockerUsername }}/novelty:${{ env.prevImage }}
 
       - name: Tag previous Docker image as latest
         run: |
