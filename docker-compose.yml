@@ -5,8 +5,6 @@ services:
     container_name: novelty-app
     image: mukesh1111/novelty:6d5e746e05bb9914198b239b33a58ff929759406
     command: ["bash", "-c", "yarn run db:migrate:dev && yarn start"]
-    volumes:
-      - .:/app
     ports:
       - "7000:7000"
     depends_on:
