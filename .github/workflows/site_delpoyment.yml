@@ -4,9 +4,6 @@ run-name: "[${{ github.event_name }} - ${{ github.ref_name }}]"
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
 
 permissions:
   contents: read
@@ -109,7 +106,7 @@ jobs:
       - name: rsync deployments
         uses: burnett01/rsync-deployments@7.0.1
         with:
-          switches: -avzr --include="deploy.sh" --include="docker-compose.yml"
+          switches: -avzr --exclude="deploy.sh" --include="docker-compose.yml" --exclude=".github/" --exclude="node_modules" --exclude="*.git" --exclude="*.md"  --exclude="*.sh" --exclude="*.json" --exclude="*.txt" --exclude="*.js" --exclude="*.html" --exclude="*.css" --exclude="*.js" --exclude="*.map" --exclude="*.png" --exclude="*.jpg" --exclude="*.jpeg" --exclude="*.gif" --exclude="*.svg" --exclude="*.ico" --exclude="*.eot" --exclude="*.otf" --exclude="*.ttf" --exclude="*.woff" --exclude="*.woff2" --exclude="*.pdf" --exclude="*.zip" --exclude="*.gz" --exclude="*.tar" --exclude="*.tgz" --exclude="*.bz2" --exclude="*.rar"
           path: ./
           remote_path: ${{ env.workDir }}
           remote_host: ${{ env.serverIp }}
