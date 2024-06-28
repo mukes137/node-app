@@ -12,6 +12,7 @@ permissions:
 
 env:
   userName: mukesh
+  port: 22
   workDir: /home/mukesh/app
   serverIp: ${{ secrets.SERVER_IP }}
   nodeversion: 20
@@ -47,7 +48,7 @@ jobs:
         uses: super-linter/super-linter/slim@v6
         env:
           DEFAULT_BRANCH: ${{ env.branchName }}
-          FILTER_REGEX_EXCLUDE: ansible/**
+          FILTER_REGEX_INCLUDE: "^src/.*"
           GITHUB_TOKEN: ${{ env.githubToken }}
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_JAVASCRIPT_STANDARD: false
@@ -100,15 +101,19 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: ${{ env.dockerUsername }}/${{ env.appName }}:${{ github.sha }}
+          tags: ${{ env.dockerUsername }}/novelty:${{ github.sha }}
 
-      # - name: rsync deployments
-      #   uses: burnett01/rsync-deployments@7.0.1
-      #   with:
-      #     switches: -avzr --exclude="ansible/" --exclude=".github/" --exclude=".git/" --exclude=".gitignore" --exclude="node_modules/" --exclude="package-lock.json" --exclude="package.json" --exclude="README.md" --exclude="LICENSE"
-      #     path: ./
-      #     remote_path: ${{ env.workDir }}
-      #     remote_host: ${{ env.serverIp }}
-      #     remote_port: 22
-      #     remote_user: ${{ env.userName }}
-      #     remote_key: ${{ env.sshKey}}
+      - name: rsync deployments
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr --exclude="deploy.sh" --include="docker-compose.yml" --exclude=".github/" --exclude="node_modules" --exclude="*.git" --exclude="*.md"  --exclude="*.sh" --exclude="*.json" --exclude="*.txt" --exclude="*.js" --exclude="*.html" --exclude="*.css" --exclude="*.js" --exclude="*.map" --exclude="*.png" --exclude="*.jpg" --exclude="*.jpeg" --exclude="*.gif" --exclude="*.svg" --exclude="*.ico" --exclude="*.eot" --exclude="*.otf" --exclude="*.ttf" --exclude="*.woff" --exclude="*.woff2" --exclude="*.pdf" --exclude="*.zip" --exclude="*.gz" --exclude="*.tar" --exclude="*.tgz" --exclude="*.bz2" --exclude="*.rar"
+          path: ./
+          remote_path: ${{ env.workDir }}
+          remote_host: ${{ env.serverIp }}
+          remote_port: 22
+          remote_user: ${{ env.userName }}
+          remote_key: ${{ env.sshKey}}
+
+      - name: executing remote ssh commands using password
+        run: |
+          ssh -i novelty.pem ${{env.userName}}@${{ env.serverIp }} 'bash -s ${{ github.sha }}' < deploy.sh

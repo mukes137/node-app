@@ -3,8 +3,8 @@ version: "3.9"
 services:
   app:
     container_name: novelty-app
-    image: novelty:v7
-    command: ["sh", "-c", "yarn run db:migrate:dev && yarn start"]
+    image: mukesh1111/novelty:3cf9b0180941b6e92abbbf5dacd6b45e401db92d
+    command: ["bash", "-c", "yarn run db:migrate:dev && yarn start"]
     volumes:
       - .:/app
     ports:
