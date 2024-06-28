@@ -70,7 +70,7 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install sshpass
+      - name: Install ansible
         run: |
           sudo apt update
           sudo apt install sshpass -y
